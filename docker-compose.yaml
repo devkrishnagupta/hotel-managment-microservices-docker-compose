@@ -1,0 +1,80 @@
+version: '3.7'
+services:
+  postgres-my-db:
+    container_name: postgres-my-db
+    image: postgres
+    environment:
+      POSTGRES_DB: microservice
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-order:/data/postgres
+  mongo-my-db:
+    container_name: mongo-my-db
+    image: mongo:4.4.14-rc0-focal
+    restart: always
+    volumes:
+      - ./mongo-data:/data/db
+
+  ## Keycloak Config with Mysql database
+  mysql-my-db:
+    container_name: mysql-my-db
+    image: mysql:5.7
+    volumes:
+      - ./mysql_keycloak_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: microservice
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+  SERVICE-REGISTRY:
+    container_name: SERVICE-REGISTRY
+    image: devkrishnagupta/testing-hotel-management-service-registry
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8084:8084"
+    expose:
+      - "8084"
+  API-GATEWAY:
+    container_name: API-GATEWAY
+    image: devkrishnagupta/testing-hotel-management-api-gateway
+    ports:
+      - "8085:8085"
+    expose:
+      - "8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+    depends_on:
+      - SERVICE-REGISTRY
+  USER-SERVICE:
+    container_name: USER-SERVICE
+    image: devkrishnagupta/testing-hotel-management-user-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - SERVICE-REGISTRY
+      - API-GATEWAY
+      - mysql-my-db
+  RATING-SERVICE:
+    container_name: RATING-SERVICE
+    image: devkrishnagupta/testing-hotel-management-rating-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8083:8083"
+    depends_on:
+      - SERVICE-REGISTRY
+      - API-GATEWAY
+      - mongo-my-db
+  HOTEL-SERVICE:
+    container_name: HOTEL-SERVICE
+    image: devkrishnagupta/testing-hotel-management-hotel-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - SERVICE-REGISTRY
+      - API-GATEWAY
+      - postgres-my-db
