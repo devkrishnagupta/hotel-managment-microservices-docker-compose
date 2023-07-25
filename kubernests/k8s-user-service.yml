@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-deployment
+spec:
+  selector:
+    matchLabels:
+      app: user-service-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: user-service-deployment
+    spec:
+      containers:
+        - name: user-service-deployment
+          image: devkrishnagupta/testing-hotel-management-user-service
+          ports:
+            - containerPort: 8081
+          env:   # Setting Enviornmental Variables
+            - name: spring.profiles.active   # Setting Database host address from configMap
+              value: k8s
+# ---
+
+# apiVersion: v1 # Kubernetes API version
+# kind: Service # Kubernetes resource kind we are creating
+# metadata: # Metadata of the resource kind we are creating
+#   name: user-service
+# spec:
+#   selector:
+#     app: user-service-deployment
+#   ports:
+#     - protocol: "TCP"
+#       port: 8081 # The port that the service is running on in the cluster
+#       targetPort: 8081 # The port exposed by the service
+#   # type: None # type of the service.
+

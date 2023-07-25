@@ -1,0 +1,49 @@
+# Configure 'Deployment' of mysql server
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deployment
+  labels:
+    app: mysql-deployment
+    tier: database
+spec:
+  selector: # mysql Pod Should contain same labels
+    matchLabels:
+      app: mysql-deployment
+      tier: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels: # Must match 'Service' and 'Deployment' selectors
+        app: mysql-deployment
+        tier: database
+    spec:
+      containers:
+        - image: mysql:5.7 # image from docker-hub
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "123456"
+            - name: MYSQL_DATABASE # Setting Database Name from a 'ConfigMap'
+              value: microservices
+          ports:
+            - containerPort: 3306
+              name: mysql
+---
+# Define a 'Service' To Expose mysql to Other Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-my-db  # DNS name
+  labels:
+    app: mysql-deployment
+    tier: database
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:       # mysql Pod Should contain same labels
+    app: mysql-deployment
+    tier: database
+  clusterIP: None  # We Use DNS, Thus ClusterIP is not relevant

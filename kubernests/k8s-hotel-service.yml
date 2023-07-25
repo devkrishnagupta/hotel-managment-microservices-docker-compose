@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hotel-service-deployment
+spec:
+  selector:
+    matchLabels:
+      app: hotel-service-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hotel-service-deployment
+    spec:
+      containers:
+        - name: hotel-service-deployment
+          image: devkrishnagupta/testing-hotel-management-hotel-service
+          ports:
+            - containerPort: 8082
+          env:   # Setting Enviornmental Variables
+            - name: spring.profiles.active   # Setting Database host address from configMap
+              value: k8s
+# ---
+
+# apiVersion: v1 # Kubernetes API version
+# kind: Service # Kubernetes resource kind we are creating
+# metadata: # Metadata of the resource kind we are creating
+#   name: hotel-service
+# spec:
+#   selector:
+#     app: hotel-service-deployment
+#   ports:
+#     - protocol: "TCP"
+#       port: 8082 # The port that the service is running on in the cluster
+#       targetPort: 8082 # The port exposed by the service
+#   # type: None # type of the service.
+

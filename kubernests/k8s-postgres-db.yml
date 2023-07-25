@@ -1,0 +1,51 @@
+# Configure 'Deployment' of mysql server
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+  labels:
+    app: postgres-deployment
+    tier: database
+spec:
+  selector: # mysql Pod Should contain same labels
+    matchLabels:
+      app: postgres-deployment
+      tier: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels: # Must match 'Service' and 'Deployment' selectors
+        app: postgres-deployment
+        tier: database
+    spec:
+      containers:
+        - image: postgres # image from docker-hub
+          name: postgres
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: '123456'
+            - name: POSTGRES_DB # Setting Database Name from a 'ConfigMap'
+              value: microservice
+          ports:
+            - containerPort: 5432
+              name: postgres
+---
+# Define a 'Service' To Expose mysql to Other Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-my-db  # DNS name
+  labels:
+    app: postgres-deployment
+    tier: database
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:       # mysql Pod Should contain same labels
+    app: postgres-deployment
+    tier: database
+  clusterIP: None  # We Use DNS, Thus ClusterIP is not relevant

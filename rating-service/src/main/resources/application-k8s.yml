@@ -1,0 +1,13 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://SERVICE-REGISTRY:8084/eureka/
+spring:
+  data:
+    mongodb:
+      uri: mongodb://mongo-my-db:27017
+      database: microservices

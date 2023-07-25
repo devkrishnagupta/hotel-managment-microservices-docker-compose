@@ -1,0 +1,13 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://SERVICE-REGISTRY:8084/eureka/
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres-my-db:5432/microservice?createDatabaseIfNotExist=true
+    username: postgres
+    password: 123456

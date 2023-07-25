@@ -1,0 +1,44 @@
+# Configure 'Deployment' of mysql server
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    app: mongo-deployment
+    tier: database
+spec:
+  selector: # mysql Pod Should contain same labels
+    matchLabels:
+      app: mongo-deployment
+      tier: database
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels: # Must match 'Service' and 'Deployment' selectors
+        app: mongo-deployment
+        tier: database
+    spec:
+      containers:
+        - image: mongo:4.4.14-rc0-focal # image from docker-hub
+          name: mongo
+          ports:
+            - containerPort: 27017
+              name: mongo
+---
+# Define a 'Service' To Expose mysql to Other Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-my-db  # DNS name
+  labels:
+    app: mongo-deployment
+    tier: database
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:       # mysql Pod Should contain same labels
+    app: mongo-deployment
+    tier: database
+  clusterIP: None  # We Use DNS, Thus ClusterIP is not relevant
