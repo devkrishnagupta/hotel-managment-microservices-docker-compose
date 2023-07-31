@@ -20,6 +20,8 @@
 		<module>user-service</module>
 		<module>rating-service</module>
 		<module>hotel-service</module>
+		<module>hystrix-dashboard</module>
+		<module>hystrix-dashboard</module>
 	</modules>
     <properties>
 		<java.version>11</java.version>
